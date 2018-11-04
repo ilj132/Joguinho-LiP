@@ -5,7 +5,10 @@
 using namespace std;
 
 void iniciante();
+void gerarmatriz2(char [][10],int );
 int analisa(char [][10],int , int );
+bool descobrir(char matrizinicial2[][10],char matrizinicial[][10],int linha, int coluna);
+void imprimirmatriz(char matriz[][10]);
 int main()
 {
     int o;
@@ -30,14 +33,20 @@ int main()
 
 void iniciante()
 {
-    char matrizinicial[10][10],matrizinicial2[10][10],cordx='A';
-    int minas=10,minacont=10,gera,gera2,cont=0,cordy=1,op;
+    char matrizinicial[10][10], matrizinicial2[10][10];
+    int minas=10,minacont=10, gera, gera2, cont=0, cordy=0, cordx=0, linha, coluna;
+    cout<<" ";
+    for(int i=0;i<8;i++)
+    {
+        cout<<" "<<cordx++;
+    }
+    cout<<endl;
     for(int i=0; i<8; i++)
     {
         cout<<cordy++<<" ";
-        //cout<<cordx++<<" ";
         for(int j=0; j<8; j++)
         {
+
             matrizinicial[i][j]='.';
             matrizinicial2[i][j]='.';
             cout<<matrizinicial[i][j]<<" ";
@@ -45,15 +54,30 @@ void iniciante()
         cout<<endl;
     }
     cout<< endl;
+    gerarmatriz2(matrizinicial2,minas);
+    cout<<"   MATRIZ TESTE"<<endl;
+    imprimirmatriz(matrizinicial2);
 
+    do{
+    cout<<"Digite as coordenadas da linha e da coluna respectivamente"<<endl;
+    cin>>linha>>coluna;
+    if(descobrir(matrizinicial2,matrizinicial,linha,coluna))
+    {
+        break;
+    }
+    }while(linha>=0 && linha<8 && coluna>=0 && coluna<8);
+}
+
+void gerarmatriz2(char matrizinicial2[][10],int minas)
+{
+    int gera,gera2;
     for(int i=minas; i>0; i--){
 
             gera=rand()%8;
             gera2=rand()%8;
             if(matrizinicial2[gera][gera2]=='*')
             {
-                gera=rand()%8;
-                gera2=rand()%8;
+                i++;
             }
             else
                 matrizinicial2[gera][gera2]='*';
@@ -65,24 +89,41 @@ void iniciante()
                 matrizinicial2[i][j]= '0' + analisa(matrizinicial2,i,j);
         }
     }
+}
 
-    do{
-        cout<< "Minas a marcar: "<<minacont<<endl;
-        cout<<"D --> Descobrir quadrado"<<endl;
-        cout<<"M --> Marcar mina"<<endl;
-        cout<<"T --> Talvez mina"<<endl;
-        cout<<"L --> Limpar Marcação"<<endl;
-        cout<<"S --> Sair"<<endl;
+bool descobrir(char matrizinicial2[][10],char matrizinicial[][10],int linha, int coluna)
+{
+    if(matrizinicial2[linha][coluna]=='*')
+    {
+        matrizinicial[linha][coluna]=matrizinicial2[linha][coluna];
+        imprimirmatriz(matrizinicial);
+        cout<<"VOCE ESCOLHEU UMA MINA E PERDEU O JOGO"<<endl;
+        return true;
+    }
+    else
+    {
+        matrizinicial[linha][coluna]=matrizinicial2[linha][coluna];
+        imprimirmatriz(matrizinicial);
+        return false;
+    }
+}
 
-    }while(op=='S' || op=='s');
-
+void imprimirmatriz(char matriz[][10])
+{
+    int cordx=0,cordy=0;
+    cout<<" ";
+    for(int i=0;i<8;i++)
+    {
+        cout<<" "<<cordx++;
+    }
+    cout<<endl;
     for(int i=0; i<8;i++){
+        cout<<cordy++<<" ";
         for(int j=0; j<8; j++){
-            cout<<matrizinicial2[i][j]<<" ";
+            cout<<matriz[i][j]<<" ";
         }
         cout<<endl;
     }
-
 }
 
 int analisa(char matrizinicial2[][10],int m, int n)
