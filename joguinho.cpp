@@ -7,13 +7,13 @@
 using namespace std;
 
 int analisa(char [40][40],int , int );
-void geraJogo(char [40][40], char [40][40]);
+void geraJogo(char [40][40], char [40][40], char [40][40]);
 void imprimirmatriz(char [40][40]);
 void mininhas(char [40][40],char [40][40],char , int , int );
 void descobrir(char [40][40],char [40][40],bool ,int , int );
 void cafifosa(char [40][40],char [40][40],int ,int );
 void revela(char matriz1[40][40],char matriz2[40][40], int linhas, int colunas);
-bool parada(int contminas);
+bool parada(char matriz2[40][40],int linhas,int colunas,int contminas);
 
 int linhas,colunas,minas;
 
@@ -22,7 +22,7 @@ int main()
     setlocale(LC_ALL, "Portuguese");
     int o, tempo=time(NULL),dt,contminas,melhorestempos[10]= {0};
 
-    char matriz1[40][40],matriz2[40][40];
+    char matriz1[40][40],matriz2[40][40],matriz3[40][40];
 
     bool jogando=false;
 
@@ -96,7 +96,7 @@ int main()
         cout<<"Número inválido, inicie o jogo novamente."<<endl;
     }
 
-    geraJogo(matriz1,matriz2);
+    geraJogo(matriz1,matriz2,matriz3);
     imprimirmatriz(matriz2);
     imprimirmatriz(matriz1);
 
@@ -104,10 +104,10 @@ int main()
     {
         dt=time(NULL)-tempo;
 
-        if(parada(contminas)){
-            cout<<"VOCÊ É TOP, CONSEGUIU DESCOBRIR TODAS AS MINAS, CARA, MEUS PARABÉNS!!!"<<endl;
-            revela(matriz1,matriz2,linhas,colunas);
+        if(parada(matriz2,linhas,colunas,contminas)){
+            revela(matriz1,matriz3,linhas,colunas);
             imprimirmatriz(matriz1);
+            cout<<endl<<endl<<"VOCÊ É TOP, CONSEGUIU DESCOBRIR TODAS AS MINAS, CARA, MEUS PARABÉNS!!!"<<endl;
             jogando=false;
             break;
         }
@@ -126,20 +126,20 @@ int main()
             {
             case 'D':
                 cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                descobrir(matriz1,matriz2,jogando,lin,col);
+                descobrir(matriz1,matriz2,jogando,lin-1,col-1);
                 break;
             case 'M':
                 cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                mininhas(matriz1,matriz2,op,lin,col);
+                mininhas(matriz1,matriz2,op,lin-1,col-1);
                 contminas--;
                 break;
             case 'T':
                 cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                mininhas(matriz1,matriz2,op,lin,col);
+                mininhas(matriz1,matriz2,op,lin-1,col-1);
                 break;
             case 'L':
                 cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                mininhas(matriz1,matriz2,op,lin,col);
+                mininhas(matriz1,matriz2,op,lin-1,col-1);
                 break;
             case 'S':
                 jogando=false;
@@ -149,11 +149,12 @@ int main()
             }
         }
         else
-            cout<<"Numero de linhas ou colunas incorreto, digite novamente."<<endl;
+            imprimirmatriz(matriz1);
+            cout<<endl<<"NÚMERO DE LINHAS OU COLUNAS INCORRETO, DIGITE NOVAMENTE."<<endl<<endl;
     }
 }
 
-void geraJogo(char matriz1[40][40], char matriz2[40][40])
+void geraJogo(char matriz1[40][40], char matriz2[40][40], char matriz3[40][40])
 {
     int geraLinha,geraColuna;
 
@@ -180,19 +181,25 @@ void geraJogo(char matriz1[40][40], char matriz2[40][40])
 
         }
     }
+
+    for(int i=0; i<linhas; i++)
+    {
+        for(int j=0; j<colunas; j++)
+            matriz3[i][j]=matriz2[i][j];
+    }
 }
 
 void imprimirmatriz(char matriz[40][40])
 {
-    int contX=0,contY=0,v[50];
+    int v[50];
     for(int i=0;i<50;i++)
     {
-        v[i]=i;
+        v[i]=i+1;
     }
     cout<<endl<<"   ";
 
     for(int i=0; i<colunas; i++)
-        if(i<10)
+        if(i<9)
             cout<<"0"<<v[i]<<" ";
         else
             cout<<v[i]<<" ";
@@ -201,7 +208,7 @@ void imprimirmatriz(char matriz[40][40])
 
     for(int i=0; i<linhas; i++)
     {
-        if(i<10)
+        if(i<9)
             cout<<"0"<<v[i]<<"  ";
         else
             cout<<v[i]<<"  ";
@@ -309,10 +316,25 @@ void revela(char matriz1[40][40],char matriz2[40][40], int linhas, int colunas)
     }
 }
 
-bool parada(int contminas)
+bool parada(char matriz2[40][40],int linhas,int colunas,int contminas)
 {
+    int cont=0;
+
+    for(int i=0;i<linhas;i++)
+    {
+        for(int j=0; j<colunas; j++)
+        {
+            if(matriz2[i][j]=='0')
+                cont++;
+        }
+    }
+
+    if(cont==0)
+        return true;
+
     if(contminas==0)
         return true;
+
     else
         return false;
 }
