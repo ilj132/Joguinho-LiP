@@ -22,7 +22,7 @@ void exibirranking();
 void memory();
 void atualizaranking(int dt,int m);
 
-int linhas,colunas,minas,contminas,dif;
+int linhas,colunas,minas,contminas,dif,tempo;
 char matriz1[40][40],matriz2[40][40],matriz3[40][40];
 bool jogando=false;
 
@@ -171,7 +171,7 @@ void atualizaranking(int dt,int m)
 int main()
 {
     setlocale(LC_ALL, "Portuguese");
-    int o, tempo=time(NULL),dt;
+    int o,dt;
 
     srand(time(NULL));
     memory();
@@ -321,6 +321,7 @@ void menufinal()
 void geraJogo(char matriz1[40][40], char matriz2[40][40], char matriz3[40][40])
 {
     int geraLinha,geraColuna;
+    tempo=time(NULL);
 
     for(int n=0; n<minas; n++)
     {
@@ -517,7 +518,7 @@ bool testarmina()
         }
     }
 
-    if(cont=10)
+    if(cont==10)
         return true;
     else
         return false;
