@@ -1,40 +1,255 @@
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <cstring>
 #include <locale.h>
-//#include <cstdio>
 
 using namespace std;
 
-int analisa(char [40][40],int , int );
+int analisa(char [40][40],int, int );
 void geraJogo(char [40][40], char [40][40], char [40][40]);
 void imprimirmatriz(char [40][40]);
-void mininhas(char [40][40],char [40][40],char , int , int );
-void descobrir(char [40][40],char [40][40],bool ,int , int );
-void cafifosa(char [40][40],char [40][40],int ,int );
+void mininhas(char [40][40],char [40][40],char, int, int );
+void descobrir(char [40][40],char [40][40],bool,int, int );
+void cafifosa(char [40][40],char [40][40],int,int );
 void revela(char matriz1[40][40],char matriz2[40][40], int linhas, int colunas);
 bool parada(char matriz2[40][40],int linhas,int colunas,int contminas);
+void menu();
 
-int linhas,colunas,minas;
+int linhas,colunas,minas,contminas,dif;
+bool jogando=false;
+
+//coisa nova
+struct dados{
+    char name[80];
+    int time;
+};
+
+dados p1i,p2i,p3i,p1d,p2d,p3d;
+
+void exibirranking()
+{
+    cout<<endl<<endl;
+    cout<<"Ranking do Modo Iniciante: "<<endl;
+    cout <<p1i.name <<" "<<p1i.time<< endl;
+    cout <<p2i.name <<" "<<p2i.time<< endl;
+    cout <<p3i.name <<" "<<p3i.time<< endl;
+    cout<<endl<<endl;
+    cout<<"Ranking do Modo Difícil: "<<endl;
+    cout <<p1d.name <<" "<<p1d.time<< endl;
+    cout <<p2d.name <<" "<<p2d.time<< endl;
+    cout <<p3d.name <<" "<<p3d.time<< endl;
+
+    cout<<endl<<endl;
+
+    menu();
+}
+
+void memory()
+{
+    char arquivo[40];
+    ifstream salvamento1,salvamento2;
+    salvamento1.open("arquivoiniciante.txt");
+    salvamento2.open("arquivodificil.txt");
+
+    //dados p1i,p2i,p3i,p1d,p2d,p3d;
+
+    if(!salvamento1.is_open())
+    {
+        cout<<"Erro, arquivo não aberto"<<endl;
+        exit(1);
+    }
+    if(!salvamento2.is_open())
+    {
+        cout<<"Erro, arquivo não aberto"<<endl;
+        exit(1);
+    }
+
+    salvamento1>>p1i.name;
+    salvamento1>>p1i.time;
+    salvamento1>>p2i.name;
+    salvamento1>>p2i.time;
+    salvamento1>>p3i.name;
+    salvamento1>>p3i.time;
+
+    salvamento2>>p1d.name;
+    salvamento2>>p1d.time;
+    salvamento2>>p2d.name;
+    salvamento2>>p2d.time;
+    salvamento2>>p3d.name;
+    salvamento2>>p3d.time;
+
+    salvamento1.close();
+    salvamento2.close();
+}
+
+void atualizaranking(int dt,int m)
+{
+    char nome[80];
+    ofstream ranking1,ranking2;
+    cout<<"Digite seu nome: "<<endl;
+    cin.getline(nome,80);
+
+    if(m==1)
+    {
+        ranking1.open("arquivoiniciante.txt");
+        if(dt<p1i.time)
+        {
+            strcpy(p3i.name,p2i.name);
+            p3i.time=p2i.time;
+            strcpy(p2i.name,p1i.name);
+            p2i.time=p1i.time;
+            strcpy(p1i.name,nome);
+            p1i.time=dt;
+        }
+        else if(dt<p2i.time)
+        {
+            strcpy(p3i.name,p2i.name);
+            p3i.time=p2i.time;
+            strcpy(p2i.name,nome);
+            p2i.time=dt;
+        }
+        else if(dt<p3i.time)
+        {
+            strcpy(p3i.name,nome);
+            p3i.time=dt;
+        }
+
+        ranking1<<p1i.name<<endl;
+        ranking1<<p1i.time<<endl;
+        ranking1<<p2i.name<<endl;
+        ranking1<<p2i.time<<endl;
+        ranking1<<p3i.name<<endl;
+        ranking1<<p3i.time<<endl;
+
+        ranking1.close();
+    }
+    else if(m==2)
+    {
+        ranking2.open("arquivodificil.txt");
+
+        if(dt<p1i.time)
+        {
+            strcpy(p3d.name,p2d.name);
+            p3d.time=p2d.time;
+            strcpy(p2d.name,p1d.name);
+            p2d.time=p1d.time;
+            strcpy(p1d.name,nome);
+            p1d.time=dt;
+        }
+        else if(dt<p2d.time)
+        {
+            strcpy(p3d.name,p2d.name);
+            p3d.time=p2d.time;
+            strcpy(p2d.name,nome);
+            p2d.time=dt;
+        }
+        else if(dt<p3d.time)
+        {
+            strcpy(p3d.name,nome);
+            p3d.time=dt;
+        }
+        ranking2<<p1d.name<<endl;
+        ranking2<<p1d.time<<endl;
+        ranking2<<p2d.name<<endl;
+        ranking2<<p2d.time<<endl;
+        ranking2<<p3d.name<<endl;
+        ranking2<<p3d.time<<endl;
+
+        ranking2.close();
+    }
+
+}
 
 int main()
 {
     setlocale(LC_ALL, "Portuguese");
-    int o, tempo=time(NULL),dt,contminas,melhorestempos[10]= {0};
-
+    int o, tempo=time(NULL),dt;
     char matriz1[40][40],matriz2[40][40],matriz3[40][40];
 
-    bool jogando=false;
+    //bool jogando=false;
+
+    //memory();
 
     srand(time(NULL));
+    memory();
+    menu();
+    geraJogo(matriz1,matriz2,matriz3);
+    imprimirmatriz(matriz2);
+    imprimirmatriz(matriz1);
 
+    while(jogando)
+    {
+        dt=time(NULL)-tempo;
+
+        if(parada(matriz2,linhas,colunas,contminas))
+        {
+            revela(matriz1,matriz3,linhas,colunas);
+            imprimirmatriz(matriz1);
+            if(dif==1)
+                atualizaranking(dt,dif);
+            else
+                atualizaranking(dt,dif);
+            cout<<endl<<endl<<"VOCÊ É TOP, CONSEGUIU DESCOBRIR TODAS AS MINAS, CARA, MEUS PARABÉNS!!!"<<endl;
+            jogando=false;
+            break;
+        }
+
+        int col, lin;
+        char op;
+
+        cout<<"Minas a marcar: "<<contminas<<endl;
+        cout<<"D --> Descobrir quadrado\nM --> Marcar Mina\nT --> Talvez Mina(ainda infuncional) \nL --> Limpar Marcação(ainda infuncional)\nS --> Sair"<<endl;
+        cout<<"Digite a opção seguida das coordenadas do quadrado: ";
+        cin>>op>>lin>>col;
+
+        if(col<=colunas && lin<=linhas)
+        {
+            switch(op)
+            {
+            case 'D':
+                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                descobrir(matriz1,matriz2,jogando,lin-1,col-1);
+                break;
+            case 'M':
+                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                mininhas(matriz1,matriz2,op,lin-1,col-1);
+                contminas--;
+                break;
+            case 'T':
+                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                mininhas(matriz1,matriz2,op,lin-1,col-1);
+                break;
+            case 'L':
+                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                mininhas(matriz1,matriz2,op,lin-1,col-1);
+                break;
+            case 'S':
+                jogando=false;
+                break;
+            default:
+                cout<<"Opção incorreta"<<endl;
+            }
+        }
+        else
+        {
+            imprimirmatriz(matriz1);
+            cout<<endl<<"NÚMERO DE LINHAS OU COLUNAS INCORRETO, DIGITE NOVAMENTE."<<endl<<endl;
+        }
+    }
+}
+
+void menu()
+{
+    int o;
     cout<<"Bem-Vindo ao Campo Minado, digite um número:"<<endl<<"1 - Novo Jogo"<<endl<<"2 - Melhor Tempo"<<endl<<"3 - Sair"<<endl;
     cin>>o;
 
     switch(o)
     {
     case 1:
-        int dif;
+        //int dif;
         cout<<"Digite a dificuldade do Jogo desejada:\n1-Fácil\n2-Difícil\n3-Personalizado"<<endl;
         cin>>dif;
         switch(dif)
@@ -86,71 +301,13 @@ int main()
         }
         break;
     case 2:
-        for(int i=0; i<10; i++)
-            cout<<melhorestempos[i]<<" segundo(s)"<<endl;
+        exibirranking();
         break;
     case 3:
-        return 0;
+        //return 0;
         break;
     default:
         cout<<"Número inválido, inicie o jogo novamente."<<endl;
-    }
-
-    geraJogo(matriz1,matriz2,matriz3);
-    imprimirmatriz(matriz2);
-    imprimirmatriz(matriz1);
-
-    while(jogando)
-    {
-        dt=time(NULL)-tempo;
-
-        if(parada(matriz2,linhas,colunas,contminas)){
-            revela(matriz1,matriz3,linhas,colunas);
-            imprimirmatriz(matriz1);
-            cout<<endl<<endl<<"VOCÊ É TOP, CONSEGUIU DESCOBRIR TODAS AS MINAS, CARA, MEUS PARABÉNS!!!"<<endl;
-            jogando=false;
-            break;
-        }
-
-        int col, lin;
-        char op;
-
-        cout<<"Minas a marcar: "<<contminas<<endl;
-        cout<<"D --> Descobrir quadrado\nM --> Marcar Mina\nT --> Talvez Mina(ainda infuncional) \nL --> Limpar Marcação(ainda infuncional)\nS --> Sair"<<endl;
-        cout<<"Digite a opção seguida das coordenadas do quadrado: ";
-        cin>>op>>lin>>col;
-
-        if(col<colunas && lin<linhas)
-        {
-            switch(op)
-            {
-            case 'D':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                descobrir(matriz1,matriz2,jogando,lin-1,col-1);
-                break;
-            case 'M':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                mininhas(matriz1,matriz2,op,lin-1,col-1);
-                contminas--;
-                break;
-            case 'T':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                mininhas(matriz1,matriz2,op,lin-1,col-1);
-                break;
-            case 'L':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
-                mininhas(matriz1,matriz2,op,lin-1,col-1);
-                break;
-            case 'S':
-                jogando=false;
-                break;
-            default:
-                cout<<"Opção incorreta"<<endl;
-            }
-        }
-        else
-            imprimirmatriz(matriz1);
-            cout<<endl<<"NÚMERO DE LINHAS OU COLUNAS INCORRETO, DIGITE NOVAMENTE."<<endl<<endl;
     }
 }
 
@@ -192,7 +349,7 @@ void geraJogo(char matriz1[40][40], char matriz2[40][40], char matriz3[40][40])
 void imprimirmatriz(char matriz[40][40])
 {
     int v[50];
-    for(int i=0;i<50;i++)
+    for(int i=0; i<50; i++)
     {
         v[i]=i+1;
     }
@@ -256,7 +413,8 @@ void descobrir(char matriz1[40][40],char matriz2[40][40],bool jogando,int lin, i
         cafifosa(matriz1,matriz2,lin,col);
         imprimirmatriz(matriz1);
     }
-    else{
+    else
+    {
         matriz1[lin][col]=matriz2[lin][col];
         imprimirmatriz(matriz1);
     }
@@ -268,13 +426,14 @@ void cafifosa(char matriz1[40][40],char matriz2[40][40],int lin,int col)
     {
         for(int j=col-1; j<=col+1; j++)
         {
-            if(matriz1[i][j]!='M' && matriz1[i][j]!='T'){
+            if(matriz1[i][j]!='M' && matriz1[i][j]!='T')
+            {
                 matriz1[i][j]=matriz2[i][j];
 
                 if(matriz2[i][j]=='0')
                 {
-                        matriz2[i][j]='_'; //para evitar repetições
-                        cafifosa(matriz1,matriz2,i,j);
+                    matriz2[i][j]='_'; //para evitar repetições
+                    cafifosa(matriz1,matriz2,i,j);
                 }
 
                 else if(matriz2[lin][col]>'0' && matriz2[lin][col]<='8')
@@ -307,9 +466,10 @@ void mininhas(char matriz1[40][40],char matriz2[40][40],char op, int lin, int co
         imprimirmatriz(matriz1);
     }
 }
+
 void revela(char matriz1[40][40],char matriz2[40][40], int linhas, int colunas)
 {
-    for(int i=0; i<linhas;i++)
+    for(int i=0; i<linhas; i++)
     {
         for(int j=0; j<colunas; j++)
             matriz1[i][j]=matriz2[i][j];
@@ -320,7 +480,7 @@ bool parada(char matriz2[40][40],int linhas,int colunas,int contminas)
 {
     int cont=0;
 
-    for(int i=0;i<linhas;i++)
+    for(int i=0; i<linhas; i++)
     {
         for(int j=0; j<colunas; j++)
         {
