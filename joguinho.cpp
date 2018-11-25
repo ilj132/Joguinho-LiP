@@ -197,6 +197,7 @@ int main()
 
         int col, lin;
         char op;
+
         imprimirmatriz(matriz1);
 
         cout<<"Minas a marcar: "<<contminas<<endl;
@@ -209,20 +210,20 @@ int main()
             switch(op)
             {
             case 'D':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                cout<<endl<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
                 descobrir(matriz1,matriz2,jogando,lin-1,col-1);
                 break;
             case 'M':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                cout<<endl<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
                 mininhas(matriz1,matriz2,op,lin-1,col-1);
                 //contminas--;
                 break;
             case 'T':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                cout<<endl<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
                 mininhas(matriz1,matriz2,op,lin-1,col-1);
                 break;
             case 'L':
-                cout<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
+                cout<<endl<<"Tempo de Jogo: "<<dt<<" segundo(s)"<<endl;
                 mininhas(matriz1,matriz2,op,lin-1,col-1);
                 break;
             case 'S':
